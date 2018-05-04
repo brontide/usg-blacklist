@@ -7,7 +7,7 @@ correctly.
 1. Setup a firewall IPv4 group called "Dynamic Threat List".  The name is important because it's used by the script.
 1. Setup firewall WAN_IN, WAN_OUT rules to drop traffic from/to this group.
 1. Install the script into /config/scripts. 
-1. Create a config.gateway.json to run this script periodically.
+1. Create/update config.gateway.json on your controller to run this script periodically.
 
 # View counters.
 
