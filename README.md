@@ -6,7 +6,12 @@ correctly.
 
 1. Setup a firewall IPv4 group called "Dynamic Threat List".  The name is important because it's used by the script.
 1. Setup firewall WAN_LOCAL, WAN_OUT rules to drop traffic from/to this group.
-1. Install the script into /config/scripts. 
+1. Install the script into /config/scripts on the USG.  Please check the files before running.
+   
+   ```
+   sudo curl -o /config/scripts/blacklist.sh https://raw.githubusercontent.com/brontide/usg-blacklist/master/blacklist.sh
+   sudo chmod 755 /config/scripts/blacklist.sh
+   ```
 1. Create/update config.gateway.json on your controller to run this script periodically.
 
 # View counters.
