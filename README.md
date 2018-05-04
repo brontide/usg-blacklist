@@ -1,4 +1,4 @@
-# Dynamic Blacklisting for the Unifi USG router
+# Dynamic IP/CIDR Blacklisting for the Unifi USG router
 
 Having migrated from EdgeRouter to USG I wanted to bring over one script that kept a daily dynamic blacklist updated
 from several reputable sources.  The script itself is quite simple but requires setup within the conttroller to work
