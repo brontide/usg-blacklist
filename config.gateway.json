@@ -1,0 +1,14 @@
+{
+    "system": {
+        "task-scheduler": {
+            "task": {
+                "blacklist": {
+                    "executable": {
+                        "path": "/config/scripts/blacklist.sh"
+                    },
+                    "interval": "24h"
+                }
+            }
+        }
+    }
+}
