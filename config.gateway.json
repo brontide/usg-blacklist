@@ -4,7 +4,8 @@
             "task": {
                 "blacklist": {
                     "executable": {
-                        "path": "/config/scripts/blacklist.sh"
+						"path": "/bin/bash",
+                        "arguments": "/config/scripts/blacklist.sh"
                     },
                     "interval": "24h"
                 }
