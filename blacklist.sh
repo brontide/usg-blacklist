@@ -46,6 +46,10 @@ else
 		date
 		} >> /config/scripts/blacklist-processing.txt
 	else 
+		{
+		echo "Blacklist is updated and backed up"
+		date
+		} >> /config/scripts/blacklist-processing.txt
 		/sbin/ipset save $ipset_list -f /config/scripts/blacklist-backup.bak
 		/sbin/ipset swap $ipset_list "$real_list"
 	fi
