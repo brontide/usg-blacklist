@@ -4,7 +4,7 @@ echo "Blacklist update started"
 date
 }  > /config/scripts/blacklist-processing.txt
 
-real_list=$(grep -B1 "FireHOL" /config/config.boot | head -n 1 | awk '{print $2}')
+real_list=$(grep -B1 "Dynamic Threat List" /config/config.boot | head -n 1 | awk '{print $2}')
 [[ -z "$real_list" ]] && { echo "aborting"; exit 1; } || echo "Updating $real_list"
 
 ipset_list="temporary-list"
