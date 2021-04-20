@@ -13,7 +13,7 @@ usgupt=$(uptime | awk '{print $4}')
 
 if [ $usgupt == "min," ]
 then
-	sbin/ipset restore -f /config/scripts/blacklist-backup.bak
+	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
 	/sbin/ipset swap $ipset_list "$real_list"
 	/sbin/ipset -! destroy $ipset_list
 	{
@@ -28,13 +28,13 @@ else
 
 	for url in https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_webclient.netset
 	do
-	echo "Fetching and processing $url"
-	{
-	echo "Processing blacklist"
-	date
-	echo $url
-	} >> /config/scripts/blacklist-processing.txt
-	curl "$url" | awk '/^[1-9]/ { print $1 }' | xargs -n1 ipset -! add $ipset_list
+		echo "Fetching and processing $url"
+		{
+		echo "Processing blacklist"
+		date
+		echo $url
+		} >> /config/scripts/blacklist-processing.txt
+		curl "$url" | awk '/^[1-9]/ { print $1 }' | xargs -n1 /sbin/ipset -! add $ipset_list
 	done
 
 	tlcontents=$(sudo /sbin/ipset list temporary-list | grep -A1 "Members:" | sed -n '2p')
