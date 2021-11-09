@@ -4,25 +4,16 @@ echo "Blacklist update started"
 date
 }  > /config/scripts/blacklist-processing.txt
 
-real_list=$(grep -B1 "Dynamic Threat List" /config/config.boot | head -n 1 | awk '{print $2}')
+real_list=$(grep -B1 "FireHOL" /config/config.boot | head -n 1 | awk '{print $2}')
 [[ -z "$real_list" ]] && { echo "aborting"; exit 1; } || echo "Updating $real_list"
 
 ipset_list="temporary-list"
 
 usgupt=$(uptime | awk '{print $4}')
 
-if [ $usgupt == "min," ]
-then
-	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
-	/sbin/ipset swap $ipset_list "$real_list"
-	/sbin/ipset -! destroy $ipset_list
-	{
-	echo "USG uptime is less than one hour, loading previous version of blacklist"
-	date
-	echo "Blacklist contents"
-	/sbin/ipset list -s "$real_list"
-	} >> /config/scripts/blacklist-processing.txt
-else
+backupexists="/config/scripts/blacklist-backup.bak"
+
+process_blacklist () {
 	/sbin/ipset -! destroy $ipset_list
 	/sbin/ipset create $ipset_list hash:net
 
@@ -37,7 +28,7 @@ else
 		curl "$url" | awk '/^[1-9]/ { print $1 }' | xargs -n1 /sbin/ipset -! add $ipset_list
 	done
 
-	tlcontents=$(sudo /sbin/ipset list temporary-list | grep -A1 "Members:" | sed -n '2p')
+	tlcontents=$(/sbin/ipset list temporary-list | grep -A1 "Members:" | sed -n '2p')
 
 	if [ -z $tlcontents ]
 	then 
@@ -62,4 +53,32 @@ else
 	} >> /config/scripts/blacklist-processing.txt
  
 	/sbin/ipset destroy $ipset_list
+}
+
+if [ $usgupt == "min," ] && [ -e $backupexists ]
+then
+	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
+	/sbin/ipset swap $ipset_list "$real_list"
+	/sbin/ipset -! destroy $ipset_list
+	{
+	echo "USG uptime is less than one hour, and backup list is found" 
+	echo "Loading previous version of blacklist. This will speed up provisioning"
+	date
+	echo "Blacklist contents"
+	/sbin/ipset list -s "$real_list"
+	} >> /config/scripts/blacklist-processing.txt
+elif [ $usgupt == "min," ] && [ ! -e $backupexists ]
+then
+	{
+	echo "USG uptime is less than one hour, but backup list is not found"
+	echo "Proceeding to create new blacklist. This will delay provisioning, but ensure you are protected"
+	date
+	} >> /config/scripts/blacklist-processing.txt
+	process_blacklist
+else
+	{
+	echo "Routine processing of blacklist started"
+	date
+	} >> /config/scripts/blacklist-processing.txt
+	process_blacklist
 fi
