@@ -1,10 +1,9 @@
 #!/bin/bash
 {
 echo "Blacklist update started"
-date
 }  > /config/scripts/blacklist-processing.txt
 
-real_list=$(grep -B1 "FireHOL" /config/config.boot | head -n 1 | awk '{print $2}')
+real_list=$(grep -B1 "Dynamic Threat List" /config/config.boot | head -n 1 | awk '{print $2}')
 [[ -z "$real_list" ]] && { echo "aborting"; exit 1; } || echo "Updating $real_list"
 
 ipset_list="temporary-list"
@@ -28,9 +27,9 @@ process_blacklist () {
 		curl "$url" | awk '/^[1-9]/ { print $1 }' | xargs -n1 /sbin/ipset -! add $ipset_list
 	done
 
-	tlcontents=$(/sbin/ipset list temporary-list | grep -A1 "Members:" | sed -n '2p')
+	tlcontents=$(/sbin/ipset list $ipset_list | grep -A1 "Members:" | sed -n '2p')
 
-	if [ -z $tlcontents ]
+	if [ -z "$tlcontents" ]
 	then 
 		{
 		echo "Temporary list is empty, not backing up or swapping list. Leaving current list and contents in place."
@@ -51,11 +50,48 @@ process_blacklist () {
 	echo "Blacklist contents"
 	/sbin/ipset list -s "$real_list"
 	} >> /config/scripts/blacklist-processing.txt
+	
+	if [ "$usgupt" != "min," ]
+	then
+		{
+		echo "Blacklist changes compared to previous run"
+		} >> /config/scripts/blacklist-processing.txt
+		
+		for Nip in $(/sbin/ipset list "$real_list" | awk '/^[1-9]/ { print }')
+		do
+			if /sbin/ipset test $ipset_list "$Nip"; [ $? != 0 ]
+			then
+				{
+				echo "ADDED $Nip to the list"
+				} >> /config/scripts/blacklist-processing.txt
+			fi
+		done
+	fi
+	
+	if [ "$usgupt" != "min," ]
+	then
+		for Oip in $(/sbin/ipset list $ipset_list | awk '/^[1-9]/ { print }')
+		do
+			if /sbin/ipset test "$real_list" "$Oip"; [ $? != 0 ]
+			then
+				{
+				echo "REMOVED $Oip from the list"
+				} >> /config/scripts/blacklist-processing.txt
+			fi
+		done
+		
+		{
+		echo "Blacklist comparision complete"
+		echo "Blacklist processing finished"
+		date
+		} >> /config/scripts/blacklist-processing.txt
+		
+	fi
  
 	/sbin/ipset destroy $ipset_list
 }
 
-if [ $usgupt == "min," ] && [ -e $backupexists ]
+if [ "$usgupt" == "min," ] && [ -e $backupexists ]
 then
 	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
 	/sbin/ipset swap $ipset_list "$real_list"
@@ -67,11 +103,12 @@ then
 	echo "Blacklist contents"
 	/sbin/ipset list -s "$real_list"
 	} >> /config/scripts/blacklist-processing.txt
-elif [ $usgupt == "min," ] && [ ! -e $backupexists ]
+elif [ "$usgupt" == "min," ] && [ ! -e $backupexists ]
 then
 	{
 	echo "USG uptime is less than one hour, but backup list is not found"
 	echo "Proceeding to create new blacklist. This will delay provisioning, but ensure you are protected"
+	echo "Blacklist changes will not be compared as this is the first creation of the list"
 	date
 	} >> /config/scripts/blacklist-processing.txt
 	process_blacklist
