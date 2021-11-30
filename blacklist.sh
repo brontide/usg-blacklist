@@ -36,17 +36,15 @@ process_blacklist () {
 		date
 		} >> /config/scripts/blacklist-processing.txt
 	else 
+		/sbin/ipset save $ipset_list -f /config/scripts/blacklist-backup.bak
+		/sbin/ipset swap $ipset_list "$real_list"
 		{
 		echo "Blacklist is updated and backed up"
 		date
 		} >> /config/scripts/blacklist-processing.txt
-		/sbin/ipset save $ipset_list -f /config/scripts/blacklist-backup.bak
-		/sbin/ipset swap $ipset_list "$real_list"
 	fi
 
 	{
-	echo "Blacklist update finished"
-	date
 	echo "Blacklist contents"
 	/sbin/ipset list -s "$real_list"
 	} >> /config/scripts/blacklist-processing.txt
@@ -81,27 +79,34 @@ process_blacklist () {
 		done
 		
 		{
-		echo "Blacklist comparision complete"
-		echo "Blacklist processing finished"
-		date
+		echo "Blacklist comparison complete"
 		} >> /config/scripts/blacklist-processing.txt
 		
 	fi
+	
+	{
+	echo "Blacklist processing finished"
+	date
+	} >> /config/scripts/blacklist-processing.txt
  
 	/sbin/ipset destroy $ipset_list
 }
 
 if [ "$usgupt" == "min," ] && [ -e $backupexists ]
 then
-	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
-	/sbin/ipset swap $ipset_list "$real_list"
-	/sbin/ipset -! destroy $ipset_list
 	{
 	echo "USG uptime is less than one hour, and backup list is found" 
 	echo "Loading previous version of blacklist. This will speed up provisioning"
 	date
+	} >> /config/scripts/blacklist-processing.txt
+	/sbin/ipset restore -f /config/scripts/blacklist-backup.bak
+	/sbin/ipset swap $ipset_list "$real_list"
+	/sbin/ipset -! destroy $ipset_list
+	{
 	echo "Blacklist contents"
 	/sbin/ipset list -s "$real_list"
+	echo "Restoration of blacklist backup complete"
+	date
 	} >> /config/scripts/blacklist-processing.txt
 elif [ "$usgupt" == "min," ] && [ ! -e $backupexists ]
 then
