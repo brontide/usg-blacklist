@@ -12,7 +12,17 @@ correctly.
    sudo curl -o /config/scripts/blacklist.sh https://raw.githubusercontent.com/brontide/usg-blacklist/master/blacklist.sh
    sudo chmod 755 /config/scripts/blacklist.sh
    ```
+1. Create symbolic link so script runs on controller reboot in addition to scheduled interval
+
+   ```
+   sudo ln -s /config/scripts/blacklist.sh /config/scripts/post-config.d/blacklist.sh
+   ```
 1. Create/update config.gateway.json on your controller to run this script periodically.
+1. Reboot USG to force immediate script execution or SSH into USG and run below command to force immediate script execution
+
+   ```
+   sudo /config/scripts/blacklist.sh
+   ```
 
 # View counters.
 
