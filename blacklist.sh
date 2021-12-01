@@ -3,7 +3,7 @@
 echo "Blacklist update started"
 }  > /config/scripts/blacklist-processing.txt
 
-real_list=$(grep -B1 "Dynamic Threat List" /config/config.boot | head -n 1 | awk '{print $2}')
+real_list=$(grep -B1 "FireHOL" /config/config.boot | head -n 1 | awk '{print $2}')
 [[ -z "$real_list" ]] && { echo "aborting"; exit 1; } || echo "Updating $real_list"
 
 ipset_list="temporary-list"
@@ -96,6 +96,8 @@ process_blacklist () {
 		else
 			TChanges=$((NChanges + OChanges));
 			{
+			echo "$NChanges additions"
+			echo "$OChanges removals"
 			echo "$TChanges total changes"
 			} >> /config/scripts/blacklist-processing.txt
 		fi
