@@ -57,11 +57,16 @@ process_blacklist () {
 		
 		for Nip in $(/sbin/ipset list "$real_list" | awk '/^[1-9]/ { print }')
 		do
-			if /sbin/ipset test $ipset_list "$Nip"; [ $? != 0 ]
+			NTotal=$((NTotal+1));
+			
+			if ! /sbin/ipset test $ipset_list "$Nip"
 			then
+				NChanges=$((NChanges+1));
 				{
 				echo "ADDED $Nip to the list"
 				} >> /config/scripts/blacklist-processing.txt
+			else
+				NoneAdded=$((NoneAdded+1));
 			fi
 		done
 	fi
@@ -70,13 +75,30 @@ process_blacklist () {
 	then
 		for Oip in $(/sbin/ipset list $ipset_list | awk '/^[1-9]/ { print }')
 		do
-			if /sbin/ipset test "$real_list" "$Oip"; [ $? != 0 ]
+			OTotal=$((OTotal+1));
+			
+			if ! /sbin/ipset test "$real_list" "$Oip"
 			then
+				OChanges=$((OChanges+1));
 				{
 				echo "REMOVED $Oip from the list"
 				} >> /config/scripts/blacklist-processing.txt
+			else
+				NoneRemoved=$((NoneRemoved+1));
 			fi
 		done
+		
+		if [ $((NTotal + OTotal)) == $((NoneAdded + NoneRemoved)) ]
+		then
+			{
+			echo "No changes"
+			} >> /config/scripts/blacklist-processing.txt
+		else
+			TChanges=$((NChanges + OChanges));
+			{
+			echo "$TChanges total changes"
+			} >> /config/scripts/blacklist-processing.txt
+		fi
 		
 		{
 		echo "Blacklist comparison complete"
