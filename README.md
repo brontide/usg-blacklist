@@ -17,7 +17,7 @@ correctly.
    ```
    sudo ln -s /config/scripts/blacklist.sh /config/scripts/post-config.d/blacklist.sh
    ```
-1. Create/update config.gateway.json on your controller to run this script periodically.
+1. Create/update config.gateway.json on your controller to run this script periodically.  Time interval specified in config.gateway.json file is always based on 00:00:00 (midnight) being the starting point.
 1. Reboot USG to force immediate script execution or SSH into USG and run below command to force immediate script execution
 
    ```
