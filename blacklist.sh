@@ -69,10 +69,7 @@ process_blacklist () {
 				NoneAdded=$((NoneAdded+1));
 			fi
 		done
-	fi
-	
-	if [ "$usgupt" != "min," ]
-	then
+		
 		for Oip in $(/sbin/ipset list $ipset_list | awk '/^[1-9]/ { print }')
 		do
 			OTotal=$((OTotal+1));
@@ -105,9 +102,8 @@ process_blacklist () {
 		{
 		echo "Blacklist comparison complete"
 		} >> /config/scripts/blacklist-processing.txt
-		
 	fi
-	
+		
 	{
 	echo "Blacklist processing finished"
 	date
