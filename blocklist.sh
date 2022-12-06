@@ -12,6 +12,13 @@ usgupt=$(uptime | awk '{print $4}')
 
 backupexists="/config/scripts/blocklist-backup.bak"
 
+if [ -e $backupexists ]
+then
+	backupexists="TRUE"
+else
+	backupexists="FALSE"
+fi
+
 process_blocklist () {
 	/sbin/ipset -! destroy $ipset_list
 	/sbin/ipset create $ipset_list hash:net
@@ -51,7 +58,7 @@ process_blocklist () {
 	/sbin/ipset list -s "$real_list"
 	} >> /config/scripts/blocklist-processing.txt
 	
-	if [ "$usgupt" != "min," ]
+	if [ "$usgupt" != "min," ] && [ "$backupexists" == "TRUE" ]
 	then
 		echo "Processing changes compared to previous run"
 		echo "To see the changes check the log located at /config/scripts/blocklist-processing.txt"
@@ -118,7 +125,7 @@ process_blocklist () {
 	echo "Blocklist processing finished"
 }
 
-if [ "$usgupt" == "min," ] && [ -e $backupexists ]
+if [ "$usgupt" == "min," ] && [ "$backupexists" = "TRUE" ]
 then
 	echo "USG uptime is less than one hour, and backup list is found" 
 	echo "Loading previous version of blocklist. This will speed up provisioning"
@@ -137,7 +144,7 @@ then
 	date
 	} >> /config/scripts/blocklist-processing.txt
 	echo "Restoration of blocklist backup complete"
-elif [ "$usgupt" == "min," ] && [ ! -e $backupexists ]
+elif [ "$usgupt" == "min," ] && [ "$backupexists" == "FALSE" ]
 then
 	echo "USG uptime is less than one hour, but backup list is not found"
 	echo "Proceeding to create new blocklist. This will delay provisioning, but ensure you are protected"
