@@ -1,27 +1,27 @@
-# Dynamic IP/CIDR Blacklisting for the Unifi USG router
+# Dynamic IP/CIDR Blocklist for the Unifi USG router
 
-Having migrated from EdgeRouter to USG I wanted to bring over one script that kept a daily dynamic blacklist updated
+Having a USG I wanted to create a script that kept a daily dynamic blocklist updated
 from several reputable sources.  The script itself is quite simple but requires setup within the conttroller to work
 correctly.
 
-1. Setup a firewall IPv4 group called "FireHOL".  The name is important because it's used by the script.
+1. Setup a firewall IPv4 group called "FireHOL" with one place holder IPv4 address or subnet such as "192.168.0.0/16" as this address will always be in the list anyway as it is a bogon.  The name is important because it's used by the script.
 1. Setup firewall WAN_IN (Internet In), WAN_LOCAL (Internet Local), WAN_OUT (Internet Out) rules to drop traffic from/to this group.
 1. Install the script into /config/scripts on the USG.  Please check the files before running.
    
    ```
-   sudo curl -o /config/scripts/blacklist.sh https://raw.githubusercontent.com/FastEddy1114/usg-blacklist/master/blacklist.sh
-   sudo chmod +x /config/scripts/blacklist.sh
+   sudo curl -o /config/scripts/blocklist.sh https://raw.githubusercontent.com/FastEddy1114/usg-blacklist/master/blocklist.sh
+   sudo chmod +x /config/scripts/blocklist.sh
    ```
-1. Create symbolic link so script runs on controller reboot in addition to scheduled interval
+1. Create symbolic link so script runs on USG reboot in addition to scheduled interval
 
    ```
-   sudo ln -s /config/scripts/blacklist.sh /config/scripts/post-config.d/blacklist.sh
+   sudo ln -s /config/scripts/blocklist.sh /config/scripts/post-config.d/blocklist.sh
    ```
 1. Create/update config.gateway.json on your controller to run this script periodically.  Time interval specified in config.gateway.json file is always based on 00:00:00 (midnight) being the starting point.
 1. Reboot USG to force immediate script execution or SSH into USG and run below command to force immediate script execution
 
    ```
-   sudo /config/scripts/blacklist.sh
+   sudo /config/scripts/blocklist.sh
    ```
 
 # View counters.
