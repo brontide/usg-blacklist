@@ -23,7 +23,7 @@ process_blocklist () {
 	/sbin/ipset -! destroy $ipset_list
 	/sbin/ipset create $ipset_list hash:net
 
-	for url in https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_webclient.netset
+	for url in https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_webclient.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_abusers_1d.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/stopforumspam_toxic.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/myip.ipset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/tor_exits.ipset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/iblocklist_onion_router.netset
 	do
 		echo "Fetching and processing $url"
 		{
@@ -58,6 +58,7 @@ process_blocklist () {
 	/sbin/ipset list -s "$real_list"
 	} >> /config/scripts/blocklist-processing.txt
 	
+<<Disabled
 	if [ "$usgupt" != "min," ] && [ "$backupexists" == "TRUE" ]
 	then
 		echo "Processing changes compared to previous run"
@@ -115,6 +116,7 @@ process_blocklist () {
 		echo "Blocklist comparison complete"
 		} >> /config/scripts/blocklist-processing.txt
 	fi
+Disabled
 		
 	{
 	echo "Blocklist processing finished"
