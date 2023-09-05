@@ -2,11 +2,11 @@
     "system": {
         "task-scheduler": {
             "task": {
-                "blacklist": {
+                "blocklist": {
                     "executable": {
-                        "path": "/config/scripts/blacklist.sh"
+                        "path": "/config/scripts/blocklist.sh"
                     },
-                    "interval": "24h"
+                    "interval": "12h"
                 }
             }
         }
