@@ -23,7 +23,7 @@ process_blocklist () {
 	/sbin/ipset -! destroy $ipset_list
 	/sbin/ipset create $ipset_list hash:net
 
-	for url in https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_webclient.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_abusers_1d.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/stopforumspam_toxic.netset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/myip.ipset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/tor_exits.ipset https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/iblocklist_onion_router.netset
+	for url in https://iplists.firehol.org/files/firehol_level1.netset https://iplists.firehol.org/files/firehol_level2.netset https://iplists.firehol.org/files/firehol_level3.netset https://iplists.firehol.org/files/firehol_webclient.netset https://iplists.firehol.org/files/firehol_abusers_1d.netset https://iplists.firehol.org/files/myip.ipset https://iplists.firehol.org/files/tor_exits.ipset https://iplists.firehol.org/files/iblocklist_onion_router.netset
 	do
 		echo "Fetching and processing $url"
 		{
